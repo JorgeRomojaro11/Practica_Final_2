@@ -4,17 +4,13 @@ import Celdas.AreaDeCultivo;
 
 public class Experimento {
     private AreaDeCultivo areaDeCultivo;
-    private int dias;
 
-    public Experimento(int tamaño, int cantidadBacterias, int comida, int dias) {
-        this.areaDeCultivo = new AreaDeCultivo(tamaño);
+    public Experimento(int duracion, int cantidadBacterias, int comida, int tamañoAreaDeCultivo) {
+        this.areaDeCultivo = new AreaDeCultivo(tamañoAreaDeCultivo);
         this.areaDeCultivo.inicializar(cantidadBacterias, comida);
-        this.dias = dias;
     }
 
-    public void ejecutar() {
-        // Implementar la lógica para ejecutar el experimento
+    public AreaDeCultivo getAreaDeCultivo() {
+        return this.areaDeCultivo;
     }
-
-    // Otros métodos necesarios
 }

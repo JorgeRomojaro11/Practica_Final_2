@@ -1,23 +1,22 @@
 package Simulacion;
 
-import Celdas.AreaDeCultivo;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Simulacion {
-    private List<AreaDeCultivo> experimentos;
+    private List<Experimento> experimentos;
 
     public Simulacion() {
         this.experimentos = new ArrayList<>();
     }
 
-    public void agregarExperimento(AreaDeCultivo experimento) {
+    public void agregarExperimento(Experimento experimento) {
         this.experimentos.add(experimento);
     }
 
     public void ejecutar() {
-        for (AreaDeCultivo experimento : experimentos) {
-            experimento.simularDia();
+        for (Experimento experimento : experimentos) {
+            experimento.getAreaDeCultivo().simularDia();
         }
     }
 }
