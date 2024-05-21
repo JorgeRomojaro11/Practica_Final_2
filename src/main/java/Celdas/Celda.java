@@ -10,11 +10,13 @@ public class Celda {
     private List<Bacteria> bacterias;
     private List<Celda> celdasAdyacentes;
     private Random random;
+    private int comida;
 
     public Celda() {
         this.bacterias = new ArrayList<>();
         this.celdasAdyacentes = new ArrayList<>();
         this.random = new Random();
+        this.comida = 0;
     }
 
     public void agregarBacteria(Bacteria bacteria) {
@@ -35,5 +37,19 @@ public class Celda {
 
     public void agregarCeldaAdyacente(Celda celda) {
         this.celdasAdyacentes.add(celda);
+    }
+
+    public List<Bacteria> getBacterias() {
+        return this.bacterias;
+    }
+
+    public void agregarComida(int cantidad) {
+        this.comida += cantidad;
+    }
+
+    public int obtenerComida() {
+        int comidaConsumida = this.comida;
+        this.comida = 0;
+        return comidaConsumida;
     }
 }
