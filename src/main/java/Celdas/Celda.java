@@ -1,6 +1,5 @@
 package Celdas;
 
-import Bacteria.Bacteria;
 
 import java.util.ArrayList;
 import java.util.List;
