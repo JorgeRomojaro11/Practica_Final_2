@@ -4,6 +4,8 @@ import Simulacion.Experimento;
 import Simulacion.Simulacion;
 import Simulacion.AreaDeCultivo;
 import Simulacion.EstrategiaSuministroConstante;
+import Celdas.Celda;
+import Celdas.Bacteria;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.time.LocalDate;
+import java.util.List;
 
 public class InterfazExperimento extends JFrame {
     private JButton botonEjecutar;
@@ -49,6 +52,16 @@ public class InterfazExperimento extends JFrame {
 
                 simulacion.ejecutar();
                 areaTexto.append("Experimento ejecutado.\n");
+
+                List<Bacteria> bacterias = experimento.getBacterias();
+                List<Celda> celdas = experimento.getCeldas();
+
+                // Crear la animación con las bacterias y las celdas del experimento
+                AnimacionExperimento animacion = new AnimacionExperimento(bacterias, celdas);
+
+                // Hacer visible la animación y comenzarla
+                animacion.setVisible(true);
+                animacion.iniciarAnimacion();
             }
         });
 
