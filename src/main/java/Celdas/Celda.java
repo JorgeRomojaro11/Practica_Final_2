@@ -10,6 +10,11 @@ public class Celda {
     private List<Celda> celdasAdyacentes;
     private Random random;
     private int comida;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
+
 
     public Celda() {
         this.bacterias = new ArrayList<>();
@@ -50,5 +55,26 @@ public class Celda {
         int comidaConsumida = this.comida;
         this.comida = 0;
         return comidaConsumida;
+    }
+
+    public int getComida() {
+        return this.comida;
+    }
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
+    }
+    public void actualizarPosicion() {
+        x = x + 1;
+        y = y + 1;
+
     }
 }
