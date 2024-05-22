@@ -1,16 +1,16 @@
 package Interfaz;
 
-import Bacteria.Bacteria;
-import Celdas.AreaDeCultivo;
-import Celdas.Celda;
 import Simulacion.Experimento;
 import Simulacion.Simulacion;
+import Simulacion.AreaDeCultivo;
+import Simulacion.EstrategiaSuministroConstante;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.time.LocalDate;
 
 public class InterfazExperimento extends JFrame {
     private JButton botonEjecutar;
@@ -30,16 +30,23 @@ public class InterfazExperimento extends JFrame {
         botonCargar = new JButton("Cargar Experimento");
         areaTexto = new JTextArea();
 
-        // Crear un experimento y agregarlo a la simulación
-        AreaDeCultivo areaDeCultivo = new AreaDeCultivo(10);
-        areaDeCultivo.inicializar(10, 100);
-        Experimento experimento = new Experimento(10, 10, 100, 10);
-        simulacion = new Simulacion();
-        simulacion.agregarExperimento(experimento);
-
         botonEjecutar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Solicitar al usuario que introduzca las estadísticas
+                String area = JOptionPane.showInputDialog("Introduce el área de cultivo:");
+                String inicializarArea = JOptionPane.showInputDialog("Introduce el área a inicializar:");
+                String inicializarCantidad = JOptionPane.showInputDialog("Introduce la cantidad a inicializar:");
+                String duracion = JOptionPane.showInputDialog("Introduce la duración del experimento:");
+                String repeticiones = JOptionPane.showInputDialog("Introduce el número de repeticiones:");
+
+                // Crear un experimento y agregarlo a la simulación
+                AreaDeCultivo areaDeCultivo = new AreaDeCultivo(Integer.parseInt(area));
+                areaDeCultivo.inicializar(Integer.parseInt(inicializarArea), Integer.parseInt(inicializarCantidad));
+                Experimento experimento = new Experimento("Experimento 1", LocalDate.now(), Integer.parseInt(duracion), Integer.parseInt(repeticiones), areaDeCultivo, new EstrategiaSuministroConstante(100));
+                simulacion = new Simulacion();
+                simulacion.agregarExperimento(experimento);
+
                 simulacion.ejecutar();
                 areaTexto.append("Experimento ejecutado.\n");
             }
@@ -48,15 +55,20 @@ public class InterfazExperimento extends JFrame {
         botonGuardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileOutputStream fileOut = new FileOutputStream("experimento.ser");
-                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                    out.writeObject(simulacion);
-                    out.close();
-                    fileOut.close();
-                    areaTexto.append("Experimento guardado en experimento.ser\n");
-                } catch (IOException i) {
-                    i.printStackTrace();
+                JFileChooser fileChooser = new JFileChooser();
+                int option = fileChooser.showSaveDialog(null);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        FileOutputStream fileOut = new FileOutputStream(file);
+                        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                        out.writeObject(simulacion);
+                        out.close();
+                        fileOut.close();
+                        areaTexto.append("Experimento guardado en " + file.getAbsolutePath() + "\n");
+                    } catch (IOException i) {
+                        i.printStackTrace();
+                    }
                 }
             }
         });
@@ -64,18 +76,23 @@ public class InterfazExperimento extends JFrame {
         botonCargar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    FileInputStream fileIn = new FileInputStream("experimento.ser");
-                    ObjectInputStream in = new ObjectInputStream(fileIn);
-                    simulacion = (Simulacion) in.readObject();
-                    in.close();
-                    fileIn.close();
-                    areaTexto.append("Experimento cargado desde experimento.ser\n");
-                } catch (IOException i) {
-                    i.printStackTrace();
-                } catch (ClassNotFoundException c) {
-                    System.out.println("Clase Simulacion no encontrada");
-                    c.printStackTrace();
+                JFileChooser fileChooser = new JFileChooser();
+                int option = fileChooser.showOpenDialog(null);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        FileInputStream fileIn = new FileInputStream(file);
+                        ObjectInputStream in = new ObjectInputStream(fileIn);
+                        simulacion = (Simulacion) in.readObject();
+                        in.close();
+                        fileIn.close();
+                        areaTexto.append("Experimento cargado desde " + file.getAbsolutePath() + "\n");
+                    } catch (IOException i) {
+                        i.printStackTrace();
+                    } catch (ClassNotFoundException c) {
+                        System.out.println("Clase Simulacion no encontrada");
+                        c.printStackTrace();
+                    }
                 }
             }
         });
@@ -91,6 +108,7 @@ public class InterfazExperimento extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new InterfazExperimento().setVisible(true);
             }
