@@ -1,9 +1,11 @@
 package Simulacion;
 
 import Celdas.Bacteria;
+import Celdas.Celda;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Experimento {
     private String nombre;
@@ -14,6 +16,7 @@ public class Experimento {
     private EstrategiaSuministroComida patronAlimentacion;
     private List<Bacteria> bacterias;
     private int diaActual = 0;
+    private ArrayList<int[][][]> resultados;
 
     public Experimento(String nombre, LocalDate fechaInicio, int duracionDias, int comidaMicrogramos, AreaDeCultivo areaDeCultivo, EstrategiaSuministroComida patronAlimentacion) {
         this.nombre = nombre;
@@ -22,23 +25,43 @@ public class Experimento {
         this.comidaMicrogramos = comidaMicrogramos;
         this.areaDeCultivo = areaDeCultivo;
         this.patronAlimentacion = patronAlimentacion;
+        this.resultados = new ArrayList<>();
     }
 
-    public String getNombre() {
-        return nombre;
+    public void ejecutar() {
+        for (int dia = 0; dia < duracionDias; dia++) {
+            simularDia();
+
+            int[][][] estado = obtenerEstadoPlato();
+            resultados.add(estado);
+        }
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    private int[][][] obtenerEstadoPlato() {
+        int[][][] estado = new int[areaDeCultivo.getFilas()][areaDeCultivo.getColumnas()][2];
+        for (int i = 0; i < areaDeCultivo.getFilas(); i++) {
+            for (int j = 0; j < areaDeCultivo.getColumnas(); j++) {
+                estado[i][j][0] = areaDeCultivo.getCeldaEnPosicion(i, j).getBacterias().size();
+                estado[i][j][1] = areaDeCultivo.getCeldaEnPosicion(i, j).getComida();
+            }
+        }
+        return estado;
     }
 
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
+    public void mostrarResultados() {
+        for (int dia = 0; dia < resultados.size(); dia++) {
+            System.out.println("Día " + dia + ":");
+            for (int fila = 0; fila < areaDeCultivo.getFilas(); fila++) {
+                for (int columna = 0; columna < areaDeCultivo.getColumnas(); columna++) {
+                    int numeroBacterias = resultados.get(dia)[fila][columna][0];
+                    int comidaRestante = resultados.get(dia)[fila][columna][1];
+                    System.out.println("Celda [" + fila + "][" + columna + "]: " + numeroBacterias + " bacterias, " + comidaRestante + " comida restante");
+                }
+            }
+        }
     }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
+
 
     public int getDuracion() {
         return duracionDias;
@@ -48,51 +71,35 @@ public class Experimento {
         return patronAlimentacion.calcularComida(diaActual);
     }
 
-    public void setDuracionDias(int duracionDias) {
-        this.duracionDias = duracionDias;
+    public int calcularComidaParaElDia() {
+        return patronAlimentacion.calcularComida(diaActual++);
     }
 
-    public int getComidaMicrogramos() {
-        return comidaMicrogramos;
-    }
+    public void simularDia() {
+        // Distribuir la comida a las bacterias
+        int comidaParaElDia = calcularComidaParaElDia();
+        areaDeCultivo.distribuirComida(comidaParaElDia);
 
-    public void setComidaMicrogramos(int comidaMicrogramos) {
-        this.comidaMicrogramos = comidaMicrogramos;
-    }
+        // Permitir que cada bacteria consuma comida y se reproduzca si es posible
+        for (Bacteria bacteria : bacterias) {
+            bacteria.consumirComida();
+            if (bacteria.puedeReproducirse()) {
+                bacterias.add(bacteria.reproducirse());
+            }
+        }
 
-    public AreaDeCultivo getAreaDeCultivo() {
-        return areaDeCultivo;
-    }
+        // Actualizar el estado de cada celda en el área de cultivo
+        areaDeCultivo.actualizarCeldas();
 
-    public void setAreaDeCultivo(AreaDeCultivo areaDeCultivo) {
-        this.areaDeCultivo = areaDeCultivo;
-    }
-
-    public EstrategiaSuministroComida getPatronAlimentacion() {
-        return patronAlimentacion;
-    }
-
-    public void setPatronAlimentacion(EstrategiaSuministroComida patronAlimentacion) {
-        this.patronAlimentacion = patronAlimentacion;
+        // Incrementar el día actual
+        diaActual++;
     }
 
     public List<Bacteria> getBacterias() {
         return bacterias;
     }
 
-    public void setBacterias(List<Bacteria> bacterias) {
-        this.bacterias = bacterias;
-    }
-
-    public int getDiaActual() {
-        return diaActual;
-    }
-
-    public void setDiaActual(int diaActual) {
-        this.diaActual = diaActual;
-    }
-
-    public int calcularComidaParaElDia() {
-        return patronAlimentacion.calcularComida(diaActual++);
+    public List<Celda> getCeldas() {
+        return areaDeCultivo.getCeldas();
     }
 }
